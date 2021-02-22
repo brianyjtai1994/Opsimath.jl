@@ -1,0 +1,9 @@
+name = "Opsimath"
+uuid = "fa7b5ff8-e156-4188-b282-3326f88831dc"
+authors = ["brianyjtai1994 <brianyjtai1994@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+Mathbrew = "d8943588-9b25-4ada-8abe-1bbf75ce050f"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"

@@ -1,0 +1,22 @@
+# This file is machine-generated - editing it directly is not advised
+
+[[DelimitedFiles]]
+deps = ["Mmap"]
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+
+[[Mathbrew]]
+git-tree-sha1 = "bbea9eb65e207631024eea1b1a5971e423c6fc1f"
+repo-rev = "main"
+repo-url = "https://github.com/brianyjtai1994/Mathbrew.jl.git"
+uuid = "d8943588-9b25-4ada-8abe-1bbf75ce050f"
+version = "0.1.0"
+
+[[Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+
+[[Printf]]
+deps = ["Unicode"]
+uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[Unicode]]
+uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
