@@ -28,9 +28,10 @@ function set_rcParams!(rc::Function, rcParams::AbstractDict; fontsize::Int=14)
 end
 
 set_ticklabels!(ax, ticks::AbstractRange{R}, dir::Symbol, mp) where R<:Real = set_ticklabels!(ax, ticks, ticks, dir, mp)
+set_ticklabels!(ax, ticks::NTuple{N,R}, dir::Symbol, mp) where {N, R<:Real} = set_ticklabels!(ax, ticks, ticks, dir, mp)
 
 function set_ticklabels!(ax, ticks::AbstractRange{T}, locs::AbstractRange{R}, dir::Symbol, mp) where {R<:Real, T<:Real}
-    label = Vector{String}(undef, length(ticks)); _tick2label!(label, ticks)
+    label = tick2label(ticks)
 
     if dir == :x
         ax.xaxis.set_major_locator(mp.ticker.MaxNLocator(length(ticks)))
@@ -51,18 +52,96 @@ function set_ticklabels!(ax, ticks::AbstractRange{T}, locs::AbstractRange{R}, di
     return nothing
 end
 
-function _tick2label!(label::Vector{String}, ticks::AR) where AR<:AbstractRange{Int}
-    @inbounds @simd for i in eachindex(ticks)
-        label[i] = string(ticks[i])
+function set_ticklabels!(ax, ticks::NTuple{N,T}, locs::NTuple{N,R}, dir::Symbol, mp) where {N, R<:Real, T<:Real}
+    label = tick2label(ticks)
+
+    if dir == :x
+        ax.xaxis.set_major_locator(mp.ticker.MaxNLocator(N))
+        ax.xaxis.set_major_locator(mp.ticker.FixedLocator(locs))
+        ax.set_xticklabels(label)
+    elseif dir == :y
+        ax.yaxis.set_major_locator(mp.ticker.MaxNLocator(N))
+        ax.yaxis.set_major_locator(mp.ticker.FixedLocator(locs))
+        ax.set_yticklabels(label)
+    elseif dir == :z
+        ax.zaxis.set_major_locator(mp.ticker.MaxNLocator(N))
+        ax.zaxis.set_major_locator(mp.ticker.FixedLocator(locs))
+        ax.set_zticklabels(label)
+    else
+        error("Invalid direction!")
     end
+
     return nothing
 end
 
-function _tick2label!(label::Vector{String}, ticks::AR) where AR<:AbstractRange{Float64}
+function tick2label(ticks::AbstractRange{Int})
+    label = Vector{String}(undef, length(ticks))
+
+    @inbounds @simd for i in eachindex(ticks)
+        label[i] = string(ticks[i])
+    end
+
+    return label
+end
+
+function tick2label(ticks::AbstractRange{T}) where T<:Real
+    label = Vector{String}(undef, length(ticks))
+
     @inbounds @simd for i in eachindex(ticks)
         label[i] = @sprintf("%.1f", ticks[i])
     end
-    return nothing
+
+    return label
+end
+
+function tick2label(ticks::NTuple{N,Int}) where N
+    if @generated
+        e = Expr(:vect); a = Vector{Any}(undef, N)
+
+        @inbounds for i in eachindex(a)
+            a[i] = :(string(ticks[$i]))
+        end
+
+        e.args = a
+
+        return quote
+            $(Expr(:meta, :inline))
+            @inbounds return $e
+        end
+    else
+        label = Vector{String}(undef, N)
+
+        @inbounds @simd for i in eachindex(ticks)
+            label[i] = string(ticks[i])
+        end
+
+        return label
+    end
+end
+
+function tick2label(ticks::NTuple{N,T}) where {N, T<:Real}
+    if @generated
+        e = Expr(:vect); a = Vector{Any}(undef, N)
+
+        @inbounds for i in eachindex(a)
+            a[i] = :(@sprintf("%.1f", ticks[$i]))
+        end
+
+        e.args = a
+
+        return quote
+            $(Expr(:meta, :inline))
+            @inbounds return $e
+        end
+    else
+        label = Vector{String}(undef, N)
+
+        @inbounds @simd for i in eachindex(ticks)
+            label[i] = @sprintf("%.1f", ticks[i])
+        end
+
+        return label
+    end
 end
 
 save_pdf(f::String, fig) = fig.savefig(f, format="pdf", dpi=600, bbox_inches="tight", backend="pgf")
