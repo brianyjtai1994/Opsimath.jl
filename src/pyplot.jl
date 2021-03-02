@@ -6,11 +6,22 @@ export set_rcParams!, set_ticklabels!, save_pdf, save_png
 
 # set_rcParams!(rc, PyPlot.PyDict(matplotlib."rcParams"), fontsize=14)
 function set_rcParams!(rc::Function, rcParams::AbstractDict; fontsize::Int=14)
+    pgfpreamble = string(
+        "\\usepackage{siunitx}",
+        "\\usepackage{mhchem}",
+        "\\usepackage{unicode-math}",
+        "\\setmainfont{XITS}",
+        "\\setmathfont{XITS Math}"
+    )
+
     rc("text", usetex=true)
+    rc("font", size=fontsize)
     rc("font", family="serif")
 
-    rcParams["font.size"] = fontsize
-    rcParams["legend.framealpha"] = 0
+    rc("legend", framealpha=0.)
+    rc("pgf", rcfonts=false)
+    rc("pgf", preamble=pgfpreamble)
+
     rcParams["text.latex.preamble"] = "\\usepackage{siunitx}\\usepackage{mhchem}"
 
     return nothing
@@ -54,5 +65,5 @@ function _tick2label!(label::Vector{String}, ticks::AR) where AR<:AbstractRange{
     return nothing
 end
 
-save_pdf(f::String, fig) = fig.savefig(f, format="pdf", dpi=600, bbox_inches="tight")
-save_png(f::String, fig) = fig.savefig(f, format="png", dpi=600, bbox_inches="tight")
+save_pdf(f::String, fig) = fig.savefig(f, format="pdf", dpi=600, bbox_inches="tight", backend="pgf")
+save_png(f::String, fig) = fig.savefig(f, format="png", dpi=600, bbox_inches="tight", backend="pgf")
