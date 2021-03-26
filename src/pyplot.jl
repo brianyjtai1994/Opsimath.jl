@@ -144,5 +144,5 @@ function tick2label(ticks::NTuple{N,T}) where {N, T<:Real}
     end
 end
 
-save_pdf(f::String, fig) = fig.savefig(f, format="pdf", dpi=600, bbox_inches="tight", backend="pgf")
-save_png(f::String, fig) = fig.savefig(f, format="png", dpi=600, bbox_inches="tight", backend="pgf")
+save_pdf(f::String, fig) = fig.savefig(f, format="pdf", dpi=600, backend="pgf")
+save_png(f::String, fig) = fig.savefig(f, format="png", dpi=600, backend="pgf")
